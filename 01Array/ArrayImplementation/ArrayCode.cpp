@@ -1,3 +1,4 @@
+// 利用裸指针开辟内存实现vector底层的常见接口和基础功能，=运算符重载及拷贝构造这里省略，不作为重点讨论
 #include"iostream"
 #include"stdlib.h"
 #include"iomanip"
