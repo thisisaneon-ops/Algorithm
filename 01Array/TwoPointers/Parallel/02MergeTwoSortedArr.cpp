@@ -1,45 +1,30 @@
-vector<int>sort(vector<int>& nums)
-{
-    mergesort(nums, 0, nums.size() - 1);
-    return nums;
-}
-void merge(vector<int>& nums, int i, int mid, int j)
-{
-    vector<int>tmp;
-    int l1 = i;
-    int l2 = mid + 1;
-    while(l1 <= mid && l2 <= j)
+/*
+[88] 合并两个有序数组
+不同于普通的归并排序，可以自己手写一下！
+逆序思想，不要开辟新的空间！
+*/
+
+void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+    int i = m - 1;
+    int j = n - 1;
+    int k = nums1.size() - 1;
+    while(i >= 0 && j >= 0)
     {
-        if(nums[l1] < nums[l2])
+        if(nums1[i] > nums2[j])
         {
-            tmp.push_back(nums[l1++]);
+            nums1[k--] = nums1[i--];
         }
         else
         {
-            tmp.push_back(nums[l2++]);
+            nums1[k--] = nums2[j--];
         }
     }
-    while(l1 <= mid)
+    while(i >= 0)
     {
-        tmp.push_back(nums[l1++]);
+        nums1[k--] = nums1[i--];
     }
-    while(l2 <= j)
+    while(j >= 0)
     {
-        tmp.push_back(nums[l2++]);
+        nums1[k--] = nums2[j--];
     }
-    for(int k = 0; k < tmp.size(); k++)
-    {
-        nums[i + k] = tmp[k];
-    }
-}
-void mergesort(vector<int>& nums, int i, int j)
-{
-    if(i >= j)
-    {
-        return;
-    }
-    int mid = i + (j - i) / 2;
-    mergesort(nums, i, mid);
-    mergesort(nums, mid + 1, j);
-    merge(nums, i, mid, j);
 }

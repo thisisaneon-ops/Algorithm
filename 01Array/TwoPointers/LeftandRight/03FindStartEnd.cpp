@@ -1,3 +1,12 @@
+/*
+##### [34]在排序数组中查找元素始末位置
+**给定一个按照升序排列的整数数组 nums，和一个目标值 target。找出给定目标值在数组中的开始位置和结束位置。**
+如果数组中不存在目标值，返回 `[-1, -1]`。
+**进阶**：设计并实现时间复杂度为 **O(log n)** 的算法
+*/
+
+// 这里涉及到 upper_bound 和 lower_bound的实现。可以在分治模块看到更清晰详细的代码和注释
+
 vector<int> findStartEnd(vector<int>& nums, int target)
 {
     int left = lower(nums, target, 0, nums.size() - 1);

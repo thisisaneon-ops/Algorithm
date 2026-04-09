@@ -1,3 +1,6 @@
+// ##### **[344] 逆序字符串**
+// 最基础的左右指针模型
+
 string ReverseString(string& s)
 {
     int left = 0;
