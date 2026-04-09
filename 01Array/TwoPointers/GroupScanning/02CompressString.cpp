@@ -1,8 +1,10 @@
 // ##### **[443] 字符串压缩**
 
 // 同样的思路；只是要求把字符串中重复的元素，用字符串 + 次数的形式表现出来 
-
-int compressString(vector<char>& chars)
+#include<vector>
+#include<iostream>
+using namespace std;
+int compressString(vector<char> &chars)
 {
     int i = 0;
     int idx = 0;
