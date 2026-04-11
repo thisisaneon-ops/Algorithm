@@ -1,215 +1,170 @@
 #include<iostream>
 #include<functional>
+#include<algorithm>
 using namespace std;
 
 template<class T>
-class AVL
-{
+class AVL {
 	using Comp = function<bool(T, T)>;
 private:
-	struct TreeNode
-	{
-		TreeNode(T val = T())
-			: val_(val)
-			, left_(nullptr)
-			, right_(nullptr)
-			, height_(1)
-		{ }
-		T val_;
-		TreeNode* left_;
-		TreeNode* right_;
-		int height_;
+	struct TreeNode {
+		TreeNode(T init_val = T())
+			: val(init_val)
+			, left(nullptr)
+			, right(nullptr)
+			, height(1){
+		}
+		T val;
+		TreeNode* left;
+		TreeNode* right;
+		int height;
 	};
-	Comp comp_;
-	TreeNode* root_;
+	Comp comp;
+	TreeNode* root;
 public:
-	// 需要用户自己重载 < 运算符
-	AVL(Comp comp = [](T a, T b)->bool {return a < b; })
-		: root_(nullptr)
-		, comp_(comp)
-	{}
-	~AVL()
-	{
-		destroy(root_);
-		root_ = nullptr;
+	AVL()
+		: root(nullptr)
+		, comp([](T a, T b)->bool {return a < b; }) {
+	}
+	~AVL() {
+		destroy(root);
+		root = nullptr;
 	}
 public:
-	void insert(const T& val)
-	{
-		root_ = insert(root_, val);
+	void insert(const T& val) {
+		root = insert(root, val);
 	}
-	void erase(const T& val)
-	{
-		root_ = erase(root_, val);
+	void erase(const T& val) {
+		root = erase(root, val);
 	}
 private:
-	TreeNode* insert(TreeNode* node, const T& val)
-	{
-		if (node == nullptr)
-		{
+	TreeNode* insert(TreeNode* node, const T& val) {
+		if (node == nullptr) {
 			return new TreeNode(val);
 		}
-		if (comp_(node->val_, val))
-		{
-			node->right_ = insert(node->right_, val);
-			if (height(node->right_) - height(node->left_) > 1)
-			{
-				if (height(node->right_->right_) > height(node->right_->left_))
-				{
+		if (comp(node->val, val)) {
+			node->right = insert(node->right, val);
+			if (height(node->right) - height(node->left) > 1) {
+				if (height(node->right->right) > height(node->right->left)){
 					node = LeftRotate(node);
 				}
-				else
-				{
+				else {
 					node = RightBalance(node);
 				}
 			}
 		}
-		else if(comp_(val, node->val_))
-		{
-			node->left_ = insert(node->left_, val);
-			if (height(node->left_) - height(node->right_) > 1)
-			{
-				if (height(node->left_->left_) > height(node->left_->right_))
-				{
+		else if (comp(val, node->val)) {
+			node->left = insert(node->left, val);
+			if (height(node->left) - height(node->right) > 1) {
+				if (height(node->left->left) > height(node->left->right)) {
 					node = RightRotate(node);
 				}
-				else
-				{
+				else {
 					node = LeftBalance(node);
 				}
 			}
 		}
-		node->height_ = max(height(node->left_), height(node->right_)) + 1;
+		node->height = max(height(node->left), height(node->right)) + 1;
 		return node;
 	}
-
-	TreeNode* erase(TreeNode* node, const T& val)
-	{
-		if (node == nullptr)
-		{
+	TreeNode* erase(TreeNode* node, const T& val){
+		if (node == nullptr) {
 			return nullptr;
 		}
-		if (comp_(node->val_, val))
-		{
-			node->right_ = erase(node->right_, val);
-			if (height(node->left_) - height(node->right_) > 1)
-			{
-				if (height(node->left_->left_) > height(node->left_->right_))
-				{
+		if (comp(node->val, val)){
+			node->right = erase(node->right, val);
+			if (height(node->left) - height(node->right) > 1) {
+				if (height(node->left->left) > height(node->left->right)){
 					node = RightRotate(node);
 				}
-				else
-				{
+				else {
 					node = LeftBalance(node);
 				}
 			}
 		}
-		else if (comp_(val, node->val_))
-		{
-			node->left_ = erase(node->left_, val);
-			if (height(node->right_) - height(node->left_) > 1)
-			{
-				if (height(node->right_->right_) > height(node->right_->left_))
-				{
+		else if (comp(val, node->val)){
+			node->left = erase(node->left, val);
+			if (height(node->right) - height(node->left) > 1) {
+				if (height(node->right->right) > height(node->right->left)) {
 					node = LeftRotate(node);
 				}
-				else
-				{
+				else {
 					node = RightBalance(node);
 				}
 			}
 		}
-		else
-		{
-			if (node->left_ != nullptr && node->right_ != nullptr)
-			{
-				if (height(node->left_) > height(node->right_))
-				{
-					TreeNode* pre = node->left_;
-					while (pre->right_ != nullptr)
-					{
-						pre = pre->right_;
+		else {
+			if (node->left && node->right) {
+				if (height(node->left) > height(node->right)){
+					TreeNode* pre = node->left;
+					while (pre->right) {
+						pre = pre->right;
 					}
-					node->val_ = pre->val_;
-					node->left_ = erase(node->left_, pre->val_);
+					node->val = pre->val;
+					node->left = erase(node->left, pre->val);
 				}
-				else
-				{
-					TreeNode* post = node->right_;
-					while (post->left_ != nullptr)
-					{
-						post = post->left_;
+				else {
+					TreeNode* post = node->right;
+					while (post->left) {
+						post = post->left;
 					}
-					node->val_ = post->val_;
-					node->right_ = erase(node->right_, post->val_);
+					node->val = post->val;
+					node->right = erase(node->right, post->val);
 				}
 			}
-			else
-			{
-				TreeNode* child = node->left_;
-				if (node->right_ != nullptr)
-				{
-					child = node->right_;
+			else {
+				TreeNode* child = node->left;
+				if (node->right) {
+					child = node->right;
 				}
 				delete node;
 				return child;
 			}
 		}
-		node->height_ = max(height(node->left_), height(node->right_)) + 1;
+		node->height = max(height(node->left), height(node->right)) + 1;
 		return node;
 	}
-
 private:
-	int height(TreeNode* node)
-	{
-		if (node == nullptr)
-		{
-			return 0;
-		}
-		return node->height_;
-	}
-	void destroy(TreeNode* node)
-	{
-		if (node == nullptr)
-		{
-			return;
-		}
-		destroy(node->left_);
-		destroy(node->right_);
-		delete node;
-	}
-	TreeNode* LeftRotate(TreeNode* node)
-	{
-		TreeNode* child = node->right_;
-		node->right_ = child->left_;
-		child->left_ = node;
-		node->height_ = max(height(node->left_), height(node->right_)) + 1;
-		child->height_ = max(height(child->left_), height(child->right_)) + 1;
+	TreeNode* LeftRotate(TreeNode* node) {
+		TreeNode* child = node->right;
+		node->right = child->left;
+		child->left = node;
+		node->height = max(height(node->left), height(node->right)) + 1;
+		child->height = max(height(child->left), height(child->right)) + 1;
 		return child;
 	}
-	TreeNode* RightRotate(TreeNode* node)
-	{
-		TreeNode* child = node->left_;
-		node->left_ = child->right_;
-		child->right_ = node;
-		node->height_ = max(height(node->left_), height(node->right_)) + 1;
-		child->height_ = max(height(child->left_), height(child->right_)) + 1;
+	TreeNode* RightRotate(TreeNode* node) {
+		TreeNode* child = node->left;
+		node->left = child->right;
+		child->right = node;
+		node->height = max(height(node->left), height(node->right)) + 1;
+		child->height = max(height(child->left), height(child->right)) + 1;
 		return child;
 	}
-	TreeNode* LeftBalance(TreeNode* node)
-	{
-		node->left_ = LeftRotate(node->left_);
+	TreeNode* LeftBalance(TreeNode* node) {
+		node->left = LeftRotate(node->left);
 		return RightRotate(node);
 	}
-	TreeNode* RightBalance(TreeNode* node)
-	{
-		node->right_ = RightRotate(node->right_);
+	TreeNode* RightBalance(TreeNode* node) {
+		node->right = RightRotate(node->right);
 		return LeftRotate(node);
+	}
+private:
+	void destroy(TreeNode* node){
+		if(node == nullptr)
+			return;
+		destroy(node->left);
+		destroy(node->right);
+		delete node;
+	}
+	int height(TreeNode* node){
+		if (node == nullptr)
+			return 0;
+		return node->height;
 	}
 };
 
-int main() 
-{
-   
-    return 0;
+int main(){
+
+	return 0;
 }
