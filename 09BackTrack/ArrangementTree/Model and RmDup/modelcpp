@@ -1,0 +1,101 @@
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+// 排列树
+// 1. 基于交换的排列树
+// 优点：原地修改，内存占用小
+// 缺点：去重不方便
+vector<int>nums = {...};
+const int length = nums.size();
+void func(int i)  // i表明
+{
+    if(i == length)
+    {
+        for(auto & u : nums)
+        {
+            cout << u << " ";
+        }
+        cout << endl;
+    }
+    else
+    {
+        for(int j = i; j < length; j++)
+        {
+            swap(nums[i], nums[j]);
+            func(i + 1);
+            swap(nums[i], nums[j]);
+        }
+    }
+}
+
+// 2. 基于全排列得排列树
+// 优点：按序，去重方便
+// 缺点：开销大
+vector<int>nums = {...};
+cosnt int length = nums.size();
+vector<int>x;
+vector<bool>states(length, 0);
+void func(int i)
+{
+    if(i == length)
+    {
+        for(auto& u : x)
+        {
+            cout << u << " ";
+        }
+        cout << endl;
+    }
+    else
+    {
+        for(int j = 0; j < length; j++)
+        {
+            if(state[j] == 1)
+            {
+                continue;
+            }
+            state[j] = 1;
+            x.push_back(nums[j]);
+            func(i + 1);
+            x.pop_back();
+            state[j] = 0;
+        }
+    }
+}
+
+// 基于全排列的排列树去重(还是需要先排序)
+int nums[] = {..};
+const int length = ...;
+vector<bool>(.., 0);
+vector<int>x;
+void func(int i)
+{
+    if(i == length)
+    {
+        for(auto& u : x)
+        {
+            cout << u << " ";
+        }
+        cout << endl;
+    }
+    else
+    {
+        for(int j = 0; j < length; j++)
+        {
+            if(state[j] == 1)
+            {
+                continue;
+            }
+            // 排列树去重逻辑：前面有重复的，如果前面没选我不选！前面选了我再选！
+            if(j > 0 && nums[j] == nums[j - 1] && state[j - 1] == 0)
+            {
+                continue;
+            }
+            x.push_back(nums[j]);
+            state[j] = 1;
+            func(i + 1);
+            state[j] = 0;
+            x.pop_back();
+        }
+    }
+}
