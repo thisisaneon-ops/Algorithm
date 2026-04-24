@@ -79,7 +79,6 @@ int main() {
 }
 #endif // DEBUG
 
-
 #ifdef DEBUG
 // DP数组优化
 // 二维数组 
@@ -128,6 +127,7 @@ int main() {
 #endif // DEBUG
 
 
+#ifdef DEBUG
 /*
 力扣1143
 1143. 最长公共子序列
@@ -153,16 +153,16 @@ public:
 		if (m < 0 || n < 0) {
 			return 0;
 		}
-		if (memo[m][n] != -1){
+		if (memo[m][n] != -1) {
 			return memo[m][n];
 		}
 		if (s[m] == t[n]) {
 			memo[m][n] = func(s, m - 1, t, n - 1, memo) + 1;
 			return memo[m][n];
 		}
-		else{
+		else {
 			int len1 = func(s, m - 1, t, n, memo);
-			int len2 = func(s, m, t, n -1, memo);
+			int len2 = func(s, m, t, n - 1, memo);
 			if (len1 > len2) {
 				memo[m][n] = len1;
 			}
@@ -200,3 +200,128 @@ public:
 		return dp[m][n];
 	}
 };
+#endif // DEBUG
+
+using namespace std;
+
+int cnt = 0;
+int LCS(string& s, int m, string& t, int n, vector<vector<int>>& memo, vector<vector<int>>& path) {
+	if (m < 0 || n < 0) {
+		return 0;
+	}
+	if (memo[m][n] > 0) {
+		return memo[m][n];
+	}
+	cnt++;
+	if (s[m] == t[n]) {
+		// 往斜对角走
+		memo[m][n] = LCS(s, m - 1, t, n - 1, memo, path) + 1;
+		path[m][n] = 3;
+		return memo[m][n];
+	}
+	else {
+		int len1 = LCS(s, m - 1, t, n, memo, path);
+		int len2 = LCS(s, m, t, n - 1, memo, path);
+		if (len1 > len2) { 
+			// 调用len1对应的函数，向上一行走
+			memo[m][n] = len1;
+			path[m][n] = 1;  // 向上
+		}
+		else {
+			memo[m][n] = len2;
+			path[m][n] = 2;  // 向左
+		}
+		return memo[m][n];
+	}
+}
+
+// instruction: 3->dig 2->left 1->up
+void print(const string& s,  vector<vector<int>>& path, int m, int n) {
+	// 回溯时打印
+	if (m < 0 || n < 0){
+		cout << "我结束了" << endl;
+		return;
+	}
+	if (path[m][n] == 1) {
+		cout << "我往上走了" << endl;
+		print(s, path, m - 1, n);
+	}
+	else if (path[m][n] == 2) {
+		cout << "我往左走了" << endl;
+		print(s, path, m, n - 1);
+	}
+	else if(path[m][n] == 3) {
+		cout << "我往左上走了" << endl;
+		print(s, path, m - 1, n - 1);
+		cout << "我要回溯了" << endl;
+		cout << s[m] << endl;
+	}
+	cout << "我往回走了" << endl;
+}
+
+void pureprint(const string& s,  vector<vector<int>>& path, int m, int n) {
+	// 回溯时打印
+	if (m < 0 || n < 0){
+		return;
+	}
+	if (path[m][n] == 1) {
+		pureprint(s, path, m - 1, n);
+	}
+	else if (path[m][n] == 2) {
+		pureprint(s, path, m, n - 1);
+	}
+	else if(path[m][n] == 3) {
+		pureprint(s, path, m - 1, n - 1);
+		cout << s[m];
+	}
+}
+
+int main() {
+	string s = "helloworld";
+	int m = s.size();
+	string t = "hlweord";
+	int n = t.size();
+	vector<vector<int>>memo(m + 1, vector<int>(n + 1, 0));
+	vector<vector<int>>path(m + 1, vector<int>(n + 1, 0));
+	int LCSsize = LCS(s, m - 1, t, n - 1, memo, path);
+	cout << LCSsize << endl;
+	cout << "cnt : " << cnt << endl; // 40
+	// 打印memo数组和path数组
+	cout << "--memo数组--" << endl;
+	cout << "   ";
+	for (int i = 0; i < n; i++) {
+		cout << t[i] << " ";
+	}
+	cout << endl;
+	for (int i = 0; i < m; i++) {
+		cout << s[i] << ": ";
+		for (int j = 0; j < n; j++) {
+			if (memo[i][j] == 0) {
+				cout << "*" << " ";
+			}
+			else
+				cout << memo[i][j] << " ";
+		}
+		cout << endl;
+	}
+	cout << "--path数组" << endl;
+	cout << "instruction: 3->dig 2->left 1->up" << endl;
+	cout << "   ";
+	for (int i = 0; i < n; i++) {
+		cout << t[i] << " ";
+	}
+	cout << endl;
+	for (int i = 0; i < m; i++) {
+		cout << s[i] << ": ";
+		for (int j = 0; j < n; j++) {
+				cout << path[i][j] << " ";
+		}
+		cout << endl;
+	}
+	// 利用Path把目标串打印出来
+	cout << "LCS: " << endl;
+	print(s, path, m-1, n-1);
+	cout << "\nLCS: " << endl;
+	pureprint(s, path, m-1, n-1);
+	return 0;
+}
