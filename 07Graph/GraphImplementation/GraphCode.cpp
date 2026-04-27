@@ -53,6 +53,7 @@ public:
 	void DFS()
 	{
 		vector<bool>visited(hVer_.size(), false);
+		// 这里标记0为true是因为他是前面的占位点
 		visited[0] = true;
 		DFS(1, visited);
 	}
