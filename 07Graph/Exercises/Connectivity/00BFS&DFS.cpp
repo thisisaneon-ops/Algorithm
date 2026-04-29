@@ -265,7 +265,7 @@ int DFSOptIslands(vector<vector<char>>& grid) {
 	Unionfind unionfind;
 }
 
-//#endif // DEBUG
+#endif // DEBUG
 
 // 547 省份数量
 #ifdef DEBUG
@@ -329,5 +329,55 @@ int findCircleNum(vector<vector<int>>& isConnected) {
 	}
 	return count;
 }
+
+// UnionFind解法
+class Solution {
+public:
+	struct UnionFind {
+	private:
+		vector<int> parent;
+		int count;
+
+	public:
+		UnionFind(int n) {
+			parent.resize(n, 0);
+			for (int i = 0; i < n; i++) {
+				parent[i] = i;
+			}
+			count = n;
+		}
+
+	public:
+		// find  查
+		int find(int x) {
+			if (parent[x] != x) {
+				parent[x] = find(parent[x]);
+			}
+			return parent[x];
+		}
+		// Union  并
+		void Union(int x, int y) {
+			int root_x = find(x);
+			int root_y = find(y);
+			if (root_x != root_y) {
+				parent[root_x] = root_y;
+				count--;
+			}
+		}
+		int getCount() { return count; }
+	};
+	int findCircleNum(vector<vector<int>>& isConnected) {
+		const int n = isConnected.size();
+		UnionFind uf(n);
+		for (int i = 0; i < n; i++) {
+			for (int j = i; j < n; j++) {
+				if (isConnected[i][j] == 1) {
+					uf.Union(i, j);
+				}
+			}
+		}
+		return uf.getCount();
+	}
+};
 #endif // DEBUG
 
