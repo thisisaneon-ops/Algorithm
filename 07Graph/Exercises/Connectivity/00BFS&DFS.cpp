@@ -224,48 +224,55 @@ int DFSOptIslands(vector<vector<char>>& grid) {
 /* BFS同理，这里不再赘述 */
 
 // 所以我们也可以使用并查集的思想来解决岛屿问题
-// 先构建并查集的class类
-class UnionFind {
-private:
-	vector<int>parent;
-	int count;
+class Solution {
 public:
-	// __INIT__
-	UnionFind() {
-		for (int i = 0; i < parent.size(); i++) {
-			parent[i] = i;
+	struct UnionFind {
+		int getCount() { return count; }
+		UnionFind(int n) {
+			count = n;
+			parent.resize(n, 0);
+			for (int i = 0; i < n; i++) {
+				parent[i] = i;
+			}
 		}
-		count = parent.size();
-	}
-public:
-	// find  查
-	int find(int x) {
-		if (parent[x] != x) {
-			parent[x] = find(parent[x]);
+		int find(int x) {
+			if (parent[x] != x) {
+				parent[x] = find(parent[x]);
+			}
+			return parent[x];
 		}
-		return parent[x];
-	}
-	// Union  并
-	void Union(int x, int y) {
-		int root_x = find(x);
-		int root_y = find(y);
-		if (root_x != root_y) {
-			parent[root_x] = root_y;
-			count--;
+		void merge(int x, int y) {
+			int rootX = find(x);
+			int rootY = find(y);
+			if (rootX != rootY) {
+				parent[rootX] = rootY;
+				count--;
+			}
 		}
+		vector<int> parent;
+		int count;
+	};
+	int numIslands(vector<vector<char>>& grid) {
+		const int m = grid.size();
+		const int n = grid[0].size();
+		int water = 0;
+		UnionFind uf(m * n);
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+				if (grid[i][j] == '1') {
+					if (i + 1 < m && grid[i + 1][j] == '1') {
+						uf.merge(i * n + j, (i + 1) * n + j);
+					}
+					if (j + 1 < n && grid[i][j + 1] == '1') {
+						uf.merge(i * n + j, i * n + j + 1);
+					}
+				}
+				else { water++; }
+			}
+		}
+		return uf.getCount() - water;
 	}
-	int getCount() {
-		return count;
-	}
-};
-
-int DFSOptIslands(vector<vector<char>>& grid) {
-	const int m = grid.size();
-	const int n = grid[0].size();
-	Unionfind unionfind;
-}
-
-#endif // DEBUG
+}; #endif // DEBUG
 
 // 547 省份数量
 #ifdef DEBUG
