@@ -272,7 +272,8 @@ public:
 		}
 		return uf.getCount() - water;
 	}
-}; #endif // DEBUG
+};
+#endif // DEBUG
 
 // 547 省份数量
 #ifdef DEBUG
@@ -388,3 +389,269 @@ public:
 };
 #endif // DEBUG
 
+// * 695. 最大岛屿面积
+#ifdef DEBUG
+
+/*
+* 695. 最大岛屿面积
+给你一个大小为 m x n 的二进制矩阵 grid。
+岛屿是由一些相邻的 1（代表土地）构成的组合，这里的“相邻”要求两个 1 必须在水平或者竖直的四个方向上相邻。你可以假设 grid 的四个边缘都被 0（代表水）包围着。
+岛屿的面积是岛上值为 1 的单元格的数目。
+计算并返回 grid 中最大的岛屿面积。如果没有岛屿，则返回面积为 0。
+*/
+void DFS(int i, int j, vector<vector<int>>& grid, int& area) {
+	if (grid[i][j] == 0) {
+		return;
+	}
+	area++;
+	grid[i][j] = 0;
+	if (i - 1 >= 0 && grid[i - 1][j] == 1) {
+		DFS(i - 1, j, grid, area);
+	}
+	if (i + 1 < grid.size() && grid[i + 1][j] == 1) {
+		DFS(i + 1, j, grid, area);
+	}
+	if (j - 1 >= 0 && grid[i][j - 1] == 1) {
+		DFS(i, j - 1, grid, area);
+	}
+	if (j + 1 < grid[0].size() && grid[i][j + 1] == 1) {
+		DFS(i, j + 1, grid, area);
+	}
+}
+int maxAreaOfIslandDFS(vector<vector<int>>& grid) {
+	const int m = grid.size();
+	const int n = grid[0].size();
+	int largestArea = 0;
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			if (grid[i][j] == 1) {
+				int area = 0;
+				DFS(i, j, grid, area);
+				largestArea = max(largestArea, area);
+			}
+		}
+	}
+	return largestArea;
+}
+
+int maxAreaOfIslandBFS(vector<vector<int>>& grid) {
+	const int m = grid.size();
+	const int n = grid[0].size();
+	int ret = 0;
+	using cord = pair<int, int>;
+	queue<cord>q;
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			if (grid[i][j] == 1) {
+				int area = 0;
+				q.emplace(i, j);
+				grid[i][j] = 0;
+				while (!q.empty()) {
+					auto front = q.front();
+					int x = front.first;
+					int y = front.second;
+					q.pop();
+					area++;
+					if (x - 1 >= 0 && grid[x - 1][y] == 1) {
+						q.emplace(x - 1, y);
+						grid[x - 1][y] = 0;
+					}
+					if (x + 1 < grid.size() && grid[x + 1][y] == 1) {
+						q.emplace(x + 1, y);
+						grid[x + 1][y] = 0;
+					}
+					if (y - 1 >= 0 && grid[x][y - 1] == 1) {
+						q.emplace(x, y - 1);
+						grid[x][y - 1] = 0;
+					}
+					if (y + 1 < grid[0].size() && grid[x][y + 1] == 1) {
+						q.emplace(x, y + 1);
+						grid[x][y + 1] = 0;
+					}
+				}
+				ret = max(ret, area);
+			}
+		}
+	}
+	return ret;
+}
+#endif // DEBUG
+
+// * 1254. 统计封闭岛屿
+#ifdef DEBUG
+/*
+* 1254. 统计封闭岛屿
+二维矩阵 grid 由 0（土地）和 1（水）组成。岛是由最大的 4 个方向连通的 0 组成的群，封闭岛是一个完全由 1 包围（左、上、右、下）的岛。
+请返回封闭岛屿的数目。
+*/
+/*
+* 先遍历第一行 第一列 最后一行 最后一列，把所有出现在这些位上的陆地以及毗邻的陆地全部变成水，再去中间找就可以了！
+*/
+void DFS(int i, int j, vector<vector<int>>& grid) {
+	if (i < 0 || i >= grid.size()) {
+		return;
+	}
+	if (j < 0 || j >= grid[0].size()) {
+		return;
+	}
+	if (grid[i][j] == 1) {
+		return;
+	}
+	grid[i][j] = 1;
+	if (i - 1 >= 0 && grid[i - 1][j] == 0) {
+		DFS(i - 1, j, grid);
+	}
+	if (i + 1 < grid.size() && grid[i + 1][j] == 0) {
+		DFS(i + 1, j, grid);
+	}
+	if (j - 1 >= 0 && grid[i][j - 1] == 0) {
+		DFS(i, j - 1, grid);
+	}
+	if (j + 1 < grid[0].size() && grid[i][j + 1] == 0) {
+		DFS(i, j + 1, grid);
+	}
+}
+int closedIsland(vector<vector<int>>& grid) {
+	// 把周围一圈先扫干净
+	const int m = grid.size();
+	const int n = grid[0].size();
+	// 第一行和最后一行
+	for (int j = 0; j < n; j++) {
+		if (grid[0][j] == 0) {
+			DFS(0, j, grid);
+		}
+		if (grid[m - 1][j] == 0) {
+			DFS(m - 1, j, grid);
+		}
+	}
+	// 第一列和最后一列
+	for (int i = 0; i < m; i++) {
+		if (grid[i][0] == 0) {
+			DFS(i, 0, grid);
+		}
+		if (grid[i][n - 1] == 0) {
+			DFS(i, n - 1, grid);
+		}
+	}
+	// 开始数数
+	int count = 0;
+	for (int i = 1; i < m - 1; i++) {
+		for (int j = 1; j < n - 1; j++) {
+			if (grid[i][j] == 0) {
+				count++;
+				DFS(i, j, grid);
+			}
+		}
+	}
+	return count;
+}
+
+#endif // DEBUG
+
+// *417. 太平洋大西洋水流问题
+#ifdef DEBUG
+
+/*
+417. 太平洋大西洋水流问题
+有一个 m × n 的矩形岛屿，与太平洋和大西洋相邻。“太平洋”处于大陆的左边界和上边界，而“大西洋”处于大陆的右边界和下边界。
+这个岛被分割成一个由若干方形单元格组成的网格。给定一个 m x n 的整数矩阵 heights，heights[r][c] 表示坐标 (r, c) 上单元格高于海平面的高度。
+岛上雨水较多，如果相邻单元格的高度小于或等于当前单元格的高度，雨水可以直接向北、南、东、西流向相邻单元格。水可以从海洋附近的任何单元格流入海洋。
+返回网格坐标 result 的 2D 列表，其中 result[i] = [ri, ci] 表示雨水从单元格 (ri, ci) 流动既可流向太平洋也可流向大西洋。
+*/
+void DFS(int i, int j, vector<vector<int>>& heights, vector<vector<bool>>& canReach) {
+	const int m = heights.size();
+	const int n = heights[0].size();
+	canReach[i][j] = true;
+	if (i - 1 >= 0 && heights[i - 1][j] >= heights[i][j] && canReach[i - 1][j] == false) {
+		DFS(i - 1, j, heights, canReach);
+	}
+	if (i + 1 < m && heights[i + 1][j] >= heights[i][j] && canReach[i + 1][j] == false) {
+		DFS(i + 1, j, heights, canReach);
+	}
+	if (j - 1 >= 0 && heights[i][j - 1] >= heights[i][j] && canReach[i][j - 1] == false) {
+		DFS(i, j - 1, heights, canReach);
+	}
+	if (j + 1 < n && heights[i][j + 1] >= heights[i][j] && canReach[i][j + 1] == false) {
+		DFS(i, j + 1, heights, canReach);
+	}
+}
+vector<vector<int>> pacificAtlantic(vector<vector<int>>& heights) {
+	vector<vector<int>> ret;
+	const int m = heights.size();
+	const int n = heights[0].size();
+	// 左上
+	vector<vector<bool>>canReachP(m, vector<bool>(n, false));
+	// 右下
+	vector<vector<bool>>canReachA(m, vector<bool>(n, false));
+	// 开始淹没
+	// 太平洋发力
+	for (int i = 0; i < m; i++) {
+		DFS(i, 0, heights, canReachP);
+	}
+	for (int j = 0; j < n; j++) {
+		DFS(0, j, heights, canReachP);
+	}
+	// 大西洋发力
+	for (int i = 0; i < m; i++) {
+		DFS(i, n - 1, heights, canReachA);
+	}
+	for (int j = 0; j < n; j++) {
+		DFS(m - 1, j, heights, canReachA);
+	}
+	// 找哪些是可以同时进入两个洋的
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			if (canReachA[i][j] == true && canReachP[i][j] == true) {
+				ret.push_back({ i, j });
+			}
+		}
+	}
+	return ret;
+}
+#endif // DEBUG
+// 79 * 单词搜索
+/*
+给定一个 m x n 二维字符网格 board和一个字符串单词word 。如果word存在于网格中，返回true ；否则，返回 false 。
+
+单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
+*/
+class Solution {
+public:
+	bool DFS(int i, int j, int k, vector<vector<char>>& board, string word,
+		vector<vector<bool>>& visited) {
+		const int m = board.size();
+		const int n = board[0].size();
+		if (k == word.size()) {
+			return true;
+		}
+		if (i < 0 || j < 0 || i >= m || j >= n) {
+			return false;
+		}
+		if (visited[i][j] == true) {
+			return false;
+		}
+		if (word[k] != board[i][j]) {
+			return false;
+		}
+		visited[i][j] = true;
+		bool up = DFS(i - 1, j, k + 1, board, word, visited);
+		bool down = DFS(i + 1, j, k + 1, board, word, visited);
+		bool left = DFS(i, j - 1, k + 1, board, word, visited);
+		bool right = DFS(i, j + 1, k + 1, board, word, visited);
+		visited[i][j] = false;
+		return up || down || left || right;
+	}
+	bool exist(vector<vector<char>>& board, string word) {
+		const int m = board.size();
+		const int n = board[0].size();
+		vector<vector<bool>> visited(m, vector<bool>(n, false));
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+				if (DFS(i, j, 0, board, word, visited)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+};
