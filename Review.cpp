@@ -821,6 +821,7 @@ int* getNext(string t) {
 	}
 	return next;
 }
+// KMP
 int KMP(string s, string t) {
 	const int m = s.size();
 	const int n = t.size();
@@ -839,6 +840,98 @@ int KMP(string s, string t) {
 	return -1;
 }
 // 串的练习(比较杂乱，考试估计考的可能性不大)
+// 判断回文
+bool isPalindrome(string s) {
+	const int n = s.size();
+	int left = 0;
+	int right = n - 1;
+	while (left < right) {
+		if (s[left] != s[right]) { return false; }
+		left++;
+		right--;
+	}
+	return true;
+}
+// 最长回文子串
+string longestPalindrome(string s) {
+	int maxLen = 0;
+	int maxStart = 0;
+	const int n = s.size();
+	// 中心扩散
+	for (int i = 0; i < n; i++) {
+		// 奇数
+		int odd = 1;
+		int dis = 1;
+		for (; i - dis >= 0 && i + dis < n; dis++) {
+			if (s[i - dis] != s[i + dis]) { break; }
+			odd += 2;
+		}
+		if (odd > maxLen) {
+			maxLen = odd;
+			maxStart = i - dis + 1;  // 小心，出循环dis已经非法
+		}
+		// 偶数
+		int even = 0;
+		dis = 0;
+		for (; i - dis >= 0 && i + 1 + dis < n; dis++) {
+			if (s[i - dis] != s[i + 1 + dis]) { break; }
+			even += 2;
+		}
+		if (even > maxLen) {
+			maxLen = even;
+			maxStart = i - dis + 1;  // 小心，出循环dis已经非法
+		}
+	}
+	return s.substr(maxStart, maxLen);
+}
+// 判断异位词
+bool isAnagram(string s, string t) {
+	const int m = s.size();
+	const int n = t.size();
+	if (m != n) { return false; }
+	vector<int>v1(26, 0);
+	vector<int>v2(26, 0);
+	for (int i = 0; i < m; i++) { v1[s[i] - 'a']++; }
+	for (int i = 0; i < n; i++) { v2[t[i] - 'a']++; }
+	for (int i = 0; i < 26; i++) {
+		if (v1[i] != v2[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+// KMP周期定理
+bool isRepeated(string s){
+	// 用拼接原理
+	string d = s + s;
+	return d.find(s, 1) != s.size();
+}
+// 最长快乐前缀
+int* getNext(string s) {
+	const int n = s.size();
+	int j = 0;	 int k = -1;
+	int* next = new int[n + 1];
+	next[j] = k;
+	while (j < n) {
+		if (k == -1 || s[j] == s[k]) {
+			j++;	k++;
+			next[j] = k;
+		}
+		else { k = next[k]; }
+	}
+	return next;
+}
+string longestHappyPrefix(string s) {
+	const int n = s.size();
+	int* next = getNext(s);
+	int len = next[n];
+	return s.substr(0, len);
+}
+// 最短回文串
+string shortestPalindrome(string s) {
+
+}
+
 
 // 6. 多维数组、稀疏矩阵和广义表
 
