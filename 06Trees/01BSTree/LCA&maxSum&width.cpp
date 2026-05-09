@@ -171,3 +171,20 @@ public:
 		return maxWidth;
 	}
 };
+// Diameter
+class DiameterSolution {
+public:
+	int Diameter(TreeNode* root) {
+		if (root == nullptr) { return 0; }
+		int maxD = 0;
+		DFS(root, maxD);
+		return maxD;
+	}
+	int DFS(TreeNode* node, int& maxD) {
+		if (node == nullptr) { return -1; }
+		int left = DFS(node->left, maxD);
+		int right = DFS(node->right, maxD);
+		maxD = max(maxD, left + right + 2);
+		return max(left + 1, right + 1);
+	}
+};
