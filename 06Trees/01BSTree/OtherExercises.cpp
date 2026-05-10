@@ -1,7 +1,9 @@
 #include<iostream>
 #include<vector>
 #include<stack>
+#include<string>
 #include<queue>
+#include<sstream>
 using namespace std;
 
 // 恢复一颗二叉搜索树(数组版本)
@@ -234,17 +236,6 @@ public:
     }
 };
 // 明天建议学习带dummy的写法，逻辑会简单一些。
-
-/*
-
-
-                                ？？？
-
-
-*/
-
-
-
 class Connect2 {
 public:
     Node* connect(Node* root) {
@@ -398,5 +389,130 @@ public:
     }
     bool hasNext() {
         return !s.empty();
+    }
+};
+
+/*
+给定一个二叉搜索树的根节点 root ，和一个整数 k 
+请你设计一个算法查找其中第 k 小的元素（k 从 1 开始计数）。
+*/
+class KthSmallest
+{
+    // LVR
+    void DFS(TreeNode* node, int& i) {
+        // 如果是空，不改变索引值
+        if (node == nullptr) {
+            return;
+        }
+        // 遵循LVR的原则
+        DFS(node->left, i);
+        // 否则说明这个节点存在，序号加一后表示当前索引是第几个
+        i++;
+        if (i == K) { target = node->val; return; }
+        DFS(node->right, i);
+    }
+    int K;
+    int target;
+public:
+    int kthSmallest(TreeNode* root, int k) {
+        K = k;
+        int idx = 0;
+        DFS(root, idx);
+        return target;
+    }
+};
+
+// 序列化和反序列化
+// 工程化练习
+class Codec {
+public:
+    // Encodes a tree to a single string.
+    // 我们采用前序遍历吧 VLR
+    string serialize(TreeNode* root) {
+        string ret;
+        ret += '[';
+        stack<TreeNode* >s;
+        if (root == nullptr) { return ret + ']'; }
+        s.push(root);
+        while (!s.empty()) {
+            auto top = s.top();
+            s.pop();
+            if (top != nullptr) {
+                ret += (to_string(top->val) + ',');
+                s.push(top->right);
+                s.push(top->left);
+            }
+            else { ret += "null,"; }
+        }
+        const int n = ret.size();
+        ret[n - 1] = ']';
+        return ret;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        if (data.size() == 2) { return nullptr; }
+        string copy = data.substr(1, data.size() - 2);
+        // 类似于stringstream读取文件
+        vector<string>nums;
+        stringstream ss(copy);
+        string curNum;
+        while (getline(ss, curNum, ',')) {
+            nums.push_back(curNum);
+        }
+        int i = 0;
+        return build(i, nums);
+    }
+
+    TreeNode* build(int& i, vector<string>& nums) {
+        string cur = nums[i];
+        i++;
+        if (cur == "null") { return nullptr; }
+        TreeNode* node = new TreeNode(stoi(cur));
+        node->left = build(i, nums);
+        node->right = build(i, nums);
+        return node;
+    }
+};
+
+// Your Codec object will be instantiated and called as such:
+// Codec ser, deser;
+// TreeNode* ans = deser.deserialize(ser.serialize(root));
+
+
+//331. 验证二叉树的前序序列化
+//中等
+//相关标签
+//premium lock icon
+//相关企业
+//序列化二叉树的一种方法是使用 前序遍历 。当我们遇到一个非空节点时，我们可以记录下这个节点的值。如果它是一个空节点，我们可以使用一个标记值记录，例如 #。
+//
+//
+//
+//例如，上面的二叉树可以被序列化为字符串 "9,3,4,#,#,1,#,#,2,#,6,#,#"，其中 # 代表一个空节点。
+//
+//给定一串以逗号分隔的序列，验证它是否是正确的二叉树的前序序列化。编写一个在不重构树的条件下的可行算法。
+//
+//保证 每个以逗号分隔的字符或为一个整数或为一个表示 null 指针的 '#' 。
+//
+//你可以认为输入格式总是有效的
+//
+//例如它永远不会包含两个连续的逗号，比如 "1,,3" 。
+//注意：不允许重建树。
+
+class preValid {
+public:
+    bool isValidSerialization(string preorder) {
+        int slots = 1;
+        stringstream ss(preorder);
+        string cur;
+        while (getline(ss, cur, ',')) {
+            // 来的不管是谁无条件消耗一个
+            slots--;
+            // 立刻检查, 看当前坑位有没有出问题(防止后面新增的坑位产生影响)
+            if (slots < 0) { return false; }
+            if (cur != "#") { slots += 2; }
+        }
+        return slots == 0;
     }
 };
