@@ -516,3 +516,4 @@ public:
         return slots == 0;
     }
 };
+// 逻辑很类似Moore Voting 可以对比着看看
